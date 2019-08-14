@@ -26,7 +26,6 @@ class Game
         puts ""
         puts "Enter a position (e.g., 1,2)"
         pos = valid_move?(gets.chomp)
-        face_up?(pos)
         while @board[pos].face_up
             puts "This card is already face up"
             pos = valid_move?(gets.chomp)
@@ -41,12 +40,6 @@ class Game
         puts ""
         puts "Please enter a *valid* position (e.g., 1,2)"
         valid_move?(gets.chomp)
-    end
-
-    def face_up?(pos)
-        return pos if @board[pos].face_up
-
-        pos = valid_move?(gets.chomp)
     end
 
     def compare_cards(pos)
