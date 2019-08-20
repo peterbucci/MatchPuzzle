@@ -4,34 +4,24 @@ require_relative "player.rb"
 require_relative "ComputerPlayer.rb"
 
 class Game
-    def initialize
-        player_type = get_player_type("Would you like to watch Crumpbot play?")
-
-        @board = Board.new
+    def initialize(player_type, difficulty)
+        @board = Board.new(difficulty)
         @player = player_type
         @prev_guessed_pos = nil
+        @difficulty = difficulty
+        @tries = difficulty
 
         play
     end
 
-    def get_player_type(message)
-        puts message
-        user_input = gets.chomp.downcase
-
-        return ComputerPlayer.new if user_input == "yes"
-        return Player.new if user_input == "no"
-
-        get_player_type("Please enter yes or no.")
-    end
-
     def play
-        until @board.win?
-            @board.render
+        until @board.win? || @tries == 0
+            @board.render(@tries)
 
             valid_move?(@player.get_input)
 
             @board.reveal(@pos)
-            @board.render
+            @board.render(@tries)
 
             @player.receive_revealed_card(@pos, @board[@pos].check_value) if @player.kind_of?(ComputerPlayer)
             @prev_guessed_pos ? compare_cards : @prev_guessed_pos = @board[@pos]
@@ -41,7 +31,9 @@ class Game
     end
 
     def valid_move?(user_input)
-        if /[0-3],[0-3]$/.match?(user_input) 
+        pattern = "[0-#{@difficulty-1}]"
+
+        if /^#{pattern},#{pattern}$/.match?(user_input) 
             @pos = user_input.split(",").map(&:to_i)
             return @pos if !@board[@pos].face_up
                 
@@ -62,6 +54,7 @@ class Game
         else
             puts "\n" + "That's not a match!"
             puts "Try again!"
+            @tries -= 1
         end
 
         sleep(2)
@@ -76,10 +69,33 @@ class Game
     end
 
     def game_over
-        @board.render
+        @board.render(@tries)
 
-        puts "\n" + "You win!"
+        puts "\n" + "You win!" if @board.win?
+        puts "\n" + "Sorry, you Lose!"
     end
 end
 
-Game.new
+def get_player_type(message = "Would you like to watch Crumpbot play?")
+    puts message
+    user_input = gets.chomp.downcase
+
+    return ComputerPlayer.new if user_input == "yes"
+    return Player.new if user_input == "no"
+
+    get_player_type("Please enter yes or no.")
+end
+
+def get_difficulty(message = "Please enter a difficulty? e.g. easy, medium, hard, or very hard")
+    puts message
+    user_input = gets.chomp.downcase
+
+    return 4 if user_input == "easy"
+    return 5 if user_input == "medium"
+    return 6 if user_input == "hard"
+    return 7 if user_input == "very hard"
+
+    get_difficulty("Please enter a valid difficulty! e.g. easy, medium, hard, or very hard")
+end
+
+Game.new(get_player_type, get_difficulty)

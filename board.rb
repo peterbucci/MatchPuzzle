@@ -1,19 +1,21 @@
 require_relative "card.rb"
 
 class Board
-    def initialize
-        @cards = [*"A".."H",*"A".."H"].map { |char| Card.new(char) }
-        @grid = populate(@cards.shuffle)
+    def initialize(difficulty)
+        half_the_deck = [*"A".."Z"].slice(0...difficulty * (difficulty / 2.0))
+        @cards = [*half_the_deck,*half_the_deck].map { |char| Card.new(char) }
+        @grid = populate(difficulty)
     end
 
-    def populate(cards)
-        cards.each_slice(4).to_a
+    def populate(difficulty)
+        @cards.shuffle.each_slice(difficulty).to_a
     end
 
-    def render
+    def render(tries_left)
         puts "\e[H\e[2J"
-        puts "  0 1 2 3"
+        puts "  " + @grid.map.with_index { |_, i| i }.join(" ")
         @grid.map.with_index { |line, i| puts i.to_s + " " + line.map(&:check_value).join(" ") }
+        puts "\n" + "Tries Left: " + tries_left.to_s + "\n"
     end
 
     def win?
