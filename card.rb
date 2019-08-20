@@ -19,9 +19,6 @@ class Card
         @face_up = false
     end
 
-    def to_s
-    end
-
     def ==(another_card)
         check_value == another_card.check_value
     end

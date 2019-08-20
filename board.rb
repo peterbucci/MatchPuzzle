@@ -30,7 +30,4 @@ class Board
         column = pos[1]
         @grid[row][column]
     end
-
-    def []=(pos, val)
-    end
 end
