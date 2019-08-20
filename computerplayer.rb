@@ -1,7 +1,9 @@
 class ComputerPlayer
+
   def initialize
     @known_cards = Hash.new
     (0..3).each { |row| (0..3).each { |column| @known_cards[[row,column]] = "" } }
+    
     @matched_cards = []
     @prev_guessed_pos = nil
   end

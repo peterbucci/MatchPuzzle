@@ -5,11 +5,23 @@ require_relative "ComputerPlayer.rb"
 
 class Game
     def initialize
+        player_type = get_player_type("Would you like to watch Crumpbot play?")
+
         @board = Board.new
-        @player = ComputerPlayer.new
+        @player = player_type
         @prev_guessed_pos = nil
 
         play
+    end
+
+    def get_player_type(message)
+        puts message
+        user_input = gets.chomp.downcase
+
+        return ComputerPlayer.new if user_input == "yes"
+        return Player.new if user_input == "no"
+
+        get_player_type("Please enter yes or no.")
     end
 
     def play
@@ -21,7 +33,7 @@ class Game
             @board.reveal(@pos)
             @board.render
 
-            @player.receive_revealed_card(@pos, @board[@pos].check_value)
+            @player.receive_revealed_card(@pos, @board[@pos].check_value) if @player.kind_of?(ComputerPlayer)
             @prev_guessed_pos ? compare_cards : @prev_guessed_pos = @board[@pos]
         end
 
@@ -46,7 +58,7 @@ class Game
 
         if matched
             puts "\n" + "You got a match!"
-            @player.receive_match(@board[@pos].check_value)
+            @player.receive_match(@board[@pos].check_value) if @player.kind_of?(ComputerPlayer)
         else
             puts "\n" + "That's not a match!"
             puts "Try again!"
